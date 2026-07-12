@@ -1,0 +1,68 @@
+[
+  {
+    "contract_id": "SAMPLE_NDA_Acme_TechCorp_2019",
+    "source_path": "data/full_contract_pdf_sample/SAMPLE_NDA_Acme_TechCorp_2019.pdf",
+    "num_chunks": 6,
+    "summary": "This Mutual Non-Disclosure Agreement between Acme Corp and TechCorp Inc. governs the exchange of confidential business and technical information as the parties evaluate a potential commercial partnership. Each party must protect the other's confidential information with reasonable care, restrict access to employees with a need to know, and may not disclose it to third parties without written consent. The agreement is not exclusive and creates no obligation to enter a further deal. Confidentiality obligations survive for three years after termination. The primary risk is that a breach could expose either party to injunctive relief and liability for direct damages, though the agreement includes no monetary penalty clause beyond standard legal remedies.",
+    "termination_clause": {
+      "found": true,
+      "clause_text": "Either party may terminate this Agreement at any time upon thirty (30) days' written notice; confidentiality obligations survive termination for three (3) years.",
+      "key_terms": {"notice_period": "30 days", "survives_termination": true, "survival_period": "3 years"}
+    },
+    "confidentiality_clause": {
+      "found": true,
+      "clause_text": "Each party shall protect the other's Confidential Information using the same degree of care it uses for its own confidential information, and shall not disclose it to third parties without prior written consent, except as required by law.",
+      "key_terms": {"standard_of_care": "same as own confidential information", "exceptions": "required by law"}
+    },
+    "liability_clause": {
+      "found": false,
+      "clause_text": "",
+      "key_terms": {}
+    },
+    "processing_seconds": 4.12
+  },
+  {
+    "contract_id": "SAMPLE_Distributor_Agreement_Nova_Retail_2020",
+    "source_path": "data/full_contract_pdf_sample/SAMPLE_Distributor_Agreement_Nova_Retail_2020.pdf",
+    "num_chunks": 14,
+    "summary": "This Distributor Agreement appoints Nova Retail Inc. as the non-exclusive distributor of the Supplier's products within North America for an initial two-year term. The Supplier is obligated to provide products meeting agreed specifications and reasonable marketing support, while the Distributor must meet minimum quarterly purchase targets and maintain adequate inventory and after-sales support. Either party may terminate for uncured material breach or insolvency. Notable risks include termination if minimum purchase thresholds are missed for two consecutive quarters, and the Distributor's liability is uncapped for unauthorized use of the Supplier's trademarks, while general liability is capped at fees paid in the prior twelve months.",
+    "termination_clause": {
+      "found": true,
+      "clause_text": "This Agreement has an initial term of two (2) years and may be terminated by either party for uncured material breach after thirty (30) days' notice, or immediately upon the other party's insolvency or bankruptcy; Supplier may also terminate if Distributor fails to meet minimum quarterly purchase targets for two consecutive quarters.",
+      "key_terms": {"initial_term": "2 years", "notice_period": "30 days", "termination_for_cause": true}
+    },
+    "confidentiality_clause": {
+      "found": true,
+      "clause_text": "Both parties agree to keep pricing, product roadmaps, and customer lists confidential during the term and for two (2) years thereafter, using them solely to perform obligations under this Agreement.",
+      "key_terms": {"survives_termination": true, "survival_period": "2 years"}
+    },
+    "liability_clause": {
+      "found": true,
+      "clause_text": "Except for breaches of the trademark and confidentiality provisions, each party's aggregate liability under this Agreement is capped at the total fees paid in the twelve (12) months preceding the claim, and neither party is liable for indirect or consequential damages.",
+      "key_terms": {"liability_cap": "12 months of fees paid", "excludes_consequential_damages": true, "carve_outs": "trademark and confidentiality breaches"}
+    },
+    "processing_seconds": 9.87
+  },
+  {
+    "contract_id": "SAMPLE_Consulting_Services_Agreement_Bright_Analytics_2021",
+    "source_path": "data/full_contract_pdf_sample/SAMPLE_Consulting_Services_Agreement_Bright_Analytics_2021.pdf",
+    "num_chunks": 9,
+    "summary": "Under this Consulting Services Agreement, Bright Analytics LLC will provide data-modeling consulting services to Client on a project basis, deliverables described in attached statements of work. Client must pay invoiced fees within thirty days and provide timely access to data and personnel needed for the engagement. Bright Analytics must perform services in a professional manner consistent with industry standards and maintain the confidentiality of Client data. The agreement can be terminated for convenience with fifteen days' notice, and late payments accrue interest. Liability for either party is limited to fees paid under the applicable statement of work, posing modest financial risk relative to project scope.",
+    "termination_clause": {
+      "found": true,
+      "clause_text": "Either party may terminate this Agreement for convenience upon fifteen (15) days' written notice, or immediately for the other party's uncured material breach.",
+      "key_terms": {"notice_period": "15 days", "termination_for_convenience": true}
+    },
+    "confidentiality_clause": {
+      "found": true,
+      "clause_text": "Consultant shall not disclose Client's confidential data to any third party and shall use it only to perform the services described in the applicable statement of work.",
+      "key_terms": {}
+    },
+    "liability_clause": {
+      "found": true,
+      "clause_text": "Each party's total liability arising from this Agreement shall not exceed the fees paid under the relevant statement of work in the six (6) months preceding the claim.",
+      "key_terms": {"liability_cap": "6 months of fees paid under the relevant SOW"}
+    },
+    "processing_seconds": 6.44
+  }
+]
