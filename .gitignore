@@ -20,6 +20,7 @@ data/full_contract_txt/
 .cache/
 output/results.csv
 output/results.json
+output/accuracy_report_groq.csv
 output/model_comparison.csv
 
 # OS / editor
