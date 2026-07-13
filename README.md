@@ -13,7 +13,7 @@ Built for the AI Intern take-home assignment: *Document Processing with LLMs*.
 
 ```bash
 git clone <this-repo> && cd cuad-clause-extraction
-python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
+py -3.12 -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env   # add a GROQ_API_KEY (free at console.groq.com/keys)
 
@@ -21,7 +21,9 @@ python scripts/download_cuad.py --sample 50        # real CUAD data, 50 contract
 python main.py --data-dir data/full_contract_pdf_sample --limit 50
 ```
 
-Outputs land in `output/results.csv` and `output/results.json`. See
+Outputs land in `output/results.csv` and `output/results.json` — and an
+**accuracy check against CUAD's own expert gold labels prints automatically**
+right after the batch finishes (see [Accuracy](#accuracy) below). See
 [Troubleshooting](#troubleshooting) if the first run fails with a `proxies`
 TypeError — it's a one-line fix.
 
@@ -101,10 +103,10 @@ version of the architecture (exportable to PNG/SVG for slides) is in
 
 ```
 cuad-clause-extraction/
-├── main.py                       # CLI entry point — run the full batch pipeline
+├── main.py                       # CLI entry point — runs the pipeline, then auto-prints an accuracy check
 ├── compare_models.py             # Bonus: side-by-side model comparison
 ├── app.py                        # Streamlit demo (upload PDF + semantic search)
-├── demo_pipeline_walkthrough.ipynb  # Executed notebook demo — real CUAD data, cell-by-cell
+├── demo_pipeline_walkthrough.ipynb  # Executed notebook demo — real CUAD data, cell-by-cell, incl. accuracy step
 ├── src/
 │   ├── config.py                 # All tunables in one place
 │   ├── data_loader.py            # PDF -> raw text (Task 1)
@@ -120,7 +122,8 @@ cuad-clause-extraction/
 │   └── few_shot_examples.py      # Bonus — few-shot examples per clause type
 ├── scripts/
 │   ├── download_cuad.py          # Downloads full CUAD v1 + builds a 50-contract sample
-│   └── prepare_demo_contracts.py # Builds the small real-data demo set (no big download)
+│   ├── prepare_demo_contracts.py # Builds the small real-data demo set (no big download)
+│   └── evaluate_accuracy.py      # Scores extractions against CUAD's gold labels (used by main.py)
 ├── docs/
 │   ├── execution_walkthrough.md  # Step-by-step trace of the real call stack, with code
 │   ├── execution_diagrams.md     # Sequence diagram + decision flowchart (Mermaid)
@@ -128,7 +131,7 @@ cuad-clause-extraction/
 ├── tests/                        # 21 unit tests (mocked LLM calls, no API key needed)
 ├── data/
 │   └── demo_contracts/           # 6 REAL CUAD contracts, bundled, ready to run offline
-└── output/                       # results.csv / results.json land here
+└── output/                       # results.csv, results.json, accuracy_report_<label>.csv land here
 ```
 
 ## Setup
@@ -182,6 +185,62 @@ Re-running is cheap: per-contract results are cached in `.cache/`, so only
 new or previously-failed contracts trigger fresh LLM calls (`--no-cache`
 forces a clean run).
 
+Every run automatically ends with an **accuracy check** printed to screen —
+see [Accuracy](#accuracy) below. Add `--skip-accuracy` to skip it (e.g. no
+internet access to fetch CUAD's gold labels, or you just want a raw run).
+
+## Accuracy
+
+"Accuracy" is a specific, measurable claim here, not a design assumption:
+after every `main.py` run, `scripts/evaluate_accuracy.py` automatically
+scores the extraction against **CUAD's own expert-labeled gold data** (not
+against another model's opinion — see the note on `compare_models.py` below
+for why that distinction matters) and prints something like:
+
+```
+==============================================================================
+ACCURACY CHECK  (against CUAD's own expert-labeled gold data)
+==============================================================================
+Matched 47/50 contracts to CUAD gold labels.
+
+  termination_clause:      38/47 (81%), avg overlap 0.64
+  liability_clause:        34/47 (72%), avg overlap 0.58
+  confidentiality_clause:  not evaluable (no CUAD gold category)
+
+Per-contract detail written to: output/accuracy_report_groq.csv
+```
+
+Two CUAD categories map cleanly onto this project's clause types
+(`Termination For Convenience` -> `termination_clause`; `Uncapped
+Liability`/`Cap On Liability` -> `liability_clause`). Confidentiality has no
+CUAD equivalent and is deliberately reported as "not evaluable" rather than
+assigning it a fabricated number — spot-check that one manually.
+
+Two metrics per clause type:
+- **Detection accuracy** — did `found: true/false` agree with whether CUAD's
+  annotators found a gold span at all?
+- **Content overlap** — for true positives, how much text overlap is there
+  between the extracted `clause_text` and CUAD's gold span (difflib ratio)?
+
+**To compare providers on accuracy, not just agreement:**
+
+```bash
+python main.py --data-dir data/full_contract_pdf_sample --limit 50 --provider groq
+cp output/results.json output/results_groq.json
+
+python main.py --data-dir data/full_contract_pdf_sample --limit 50 --provider openai
+cp output/results.json output/results_openai.json
+
+python scripts/evaluate_accuracy.py \
+    --run groq=output/results_groq.json \
+    --run openai=output/results_openai.json
+```
+
+This is the deliberately different question from `compare_models.py`, which
+only measures *agreement between two providers* — two models can agree with
+each other and both be wrong. `evaluate_accuracy.py` checks each one against
+ground truth instead.
+
 ## Run the demo notebook
 
 ```bash
@@ -189,11 +248,14 @@ jupyter notebook demo_pipeline_walkthrough.ipynb
 ```
 
 Runs the real pipeline end to end, cell by cell, on the bundled real
-contracts. Auto-detects whether a real API key is configured: with one, every
-cell calls the real LLM; without one, it falls back to a clearly-labeled
+contracts — including an accuracy-check step (Step 9) that scores the run
+against CUAD's gold labels, same logic as `scripts/evaluate_accuracy.py`.
+Auto-detects whether a real API key is configured: with one, every cell
+calls the real LLM; without one, it falls back to a clearly-labeled
 `[MOCK]` provider so the notebook still executes fully rather than erroring
-out. No code changes needed to flip between the two — just add a key to
-`.env` and restart the kernel.
+out (note: accuracy numbers from a MOCK run reflect the mock's simple
+keyword matching, not real LLM accuracy). No code changes needed to flip
+between the two — just add a key to `.env` and restart the kernel.
 
 ## Run the interactive demo
 
@@ -241,6 +303,7 @@ second, **no API key or network access required**.
 | [`docs/execution_walkthrough.md`](docs/execution_walkthrough.md) | Every function call, in the exact order it actually runs, with real code |
 | [`docs/execution_diagrams.md`](docs/execution_diagrams.md) | Mermaid sequence diagram (call order) + flowchart (cache/error logic) |
 | [`docs/architecture.drawio`](docs/architecture.drawio) | Editable system diagram — open in [app.diagrams.net](https://app.diagrams.net), export to PNG/SVG for slides |
+| [`scripts/evaluate_accuracy.py`](scripts/evaluate_accuracy.py) | Scores extractions against CUAD's gold labels; run automatically by `main.py`, or standalone for multi-provider comparison |
 
 ## Design decisions worth calling out
 
@@ -255,6 +318,7 @@ second, **no API key or network access required**.
 | Few-shot examples per clause type | Concretely improves extraction consistency and format adherence |
 | Streamlit over a custom frontend | The rubric scores extraction quality and LLM usage, not UI polish — Streamlit ships a working demo in minutes with zero deployment friction |
 | Bundled real demo contracts (not synthetic) | `data/demo_contracts/` is genuine CUAD text so the notebook and smoke tests are grounded in real content even without a 380MB dataset download |
+| Accuracy check runs automatically, not as a manual extra step | `main.py` calls `evaluate_accuracy.py` after every batch — "accuracy" stays a measured number instead of a claim someone has to remember to go verify |
 
 ## Troubleshooting
 
@@ -277,15 +341,13 @@ automatically); the CLI (`main.py`) does.
 
 ## Known limitations / next steps
 
-- **Accuracy hasn't been quantitatively measured yet.** The design is sound
-  (retrieval + few-shot + defensive parsing) but "accuracy" as a number
-  requires comparing extractions against CUAD's own expert-labeled gold
-  spans (`Termination For Convenience`, `Cap On Liability`/`Uncapped
-  Liability` map cleanly to two of the three clause types; confidentiality
-  has no direct CUAD category and would need manual spot-checking). This is
-  the single highest-value thing to add next — a
-  `scripts/evaluate_accuracy.py` that loads `output/results.json` alongside
-  CUAD's gold labels and reports detection accuracy + content overlap.
+- **Accuracy is now measured automatically** (`scripts/evaluate_accuracy.py`,
+  wired into `main.py`) against CUAD's own expert-labeled gold spans for
+  `termination_clause` and `liability_clause`. What's still manual:
+  confidentiality has no direct CUAD gold category, so it needs spot-checking
+  by hand rather than an automated score. A good next step would be running
+  the full 50-contract batch across all three providers and reporting the
+  three-way accuracy comparison table in this README as real numbers.
 - Scanned/image-only PDFs (no text layer) are skipped rather than OCR'd —
   CUAD's contracts are almost all text-based, so this wasn't needed here,
   but would be the natural next step (e.g. via `pytesseract`).
