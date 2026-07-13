@@ -1,3 +1,7 @@
+**🔗 Live demo:** [yourname-cuad-clause-extraction.streamlit.app](https://karthiks-cuad-clause-extraction.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://karthiks-cuad-clause-extraction.streamlit.app)
+
+
 # Contract Clause Extraction & Summarization Pipeline
 
 An LLM-powered pipeline that reads legal contracts (PDF), extracts three key
@@ -10,9 +14,6 @@ Built for the AI Intern take-home assignment: *Document Processing with LLMs*.
 ---
 
 ## Quick start
-
-**🔗 Live demo:** [yourname-cuad-clause-extraction.streamlit.app](https://karthiks-cuad-clause-extraction.streamlit.app)
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://karthiks-cuad-clause-extraction.streamlit.app)
 
 ```bash
 git clone <this-repo> && cd cuad-clause-extraction
