@@ -1,4 +1,4 @@
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://karthiks-cuad-clause-extraction.streamlit.app)
+** [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://karthiks-cuad-clause-extraction.streamlit.app) **
 ## 🔗 Live demo:
 [karthiks-cuad-clause-extraction.streamlit.app](https://karthiks-cuad-clause-extraction.streamlit.app)
 
